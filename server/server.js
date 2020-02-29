@@ -2,12 +2,17 @@ const express = require('express')
 const app = express()
 const http = require('http')
 const socketio = require('socket.io')
-const mongojs = require('mongojs')
+    // const mongojs = require('mongojs')
+
+// const db = mongojs("mongodb+srv://abagel21:#Alexbaby6414159@cluster0-wykae.mongodb.net/test?retryWrites=true&w=majority", ['account ', 'progress '])
+
 
 
 // app.get('/', (req, res) => {
 //     res.sendFile(`${clientPath}/index.html`)
 // })
+
+
 
 const clientPath = `${__dirname}/../client`;
 console.log(`serving static from ${clientPath}`);
@@ -180,20 +185,30 @@ var USERS = {
 }
 
 var isValidPassword = function(data, cb) {
-    setTimeout(function() {
-        cb(USERS[data.username] === data.password);
-    }, 10);
+    return cb(true);
+    db.account.find({ account: data.username, password: data.password }, function(err, res) {
+        if (res.length > 0) {
+            cb(true)
+        } else {
+            cb(false)
+        }
+    });
 }
 var isUsernameTaken = function(data, cb) {
-    setTimeout(function() {
-        cb(USERS[data.username]);
-    }, 10);
+    return cb(false);
+    db.account.find({ account: data.username }, function(err, res) {
+        if (res.length > 0) {
+            cb(true)
+        } else {
+            cb(false)
+        }
+    });
 }
 var addUser = function(data, cb) {
-    setTimeout(function() {
-        USERS[data.username] = data.password;
+    return cb();
+    db.account.insert({ account: data.username, password: data.password }, function(err, res) {
         cb();
-    }, 10);
+    });
 }
 
 io.on('connection', (sock) => {
@@ -283,6 +298,6 @@ server.on('error', (err) => {
     console.error('Server error: ' + err)
 })
 
-server.listen(8080, () => {
+server.listen(process.env.PORT || 8080, () => {
     console.log('Server initialized')
 })
