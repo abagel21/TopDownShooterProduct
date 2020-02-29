@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>pointnshoot</title>
+</head>
+
+<body>
+    <div id='signwrap'>
+        <form id='formwrap'>
+            <h3>Username: </h3>
+            <input type="text" id='username' placeholder='Username'>
+            <h3>Password: </h3>
+            <input type="password" id='password' placeholder='Password'>
+            <button id='signin'>Sign In</button>
+            <button id='signup'>Sign Up</button>
+        </form>
+    </div>
+    <div id=gamewrap style='display:none'>
+        <canvas id='ctx' width='1800' height='800' style='border:1px solid #000000;'></canvas>
+        <h2>COOL GAME HERE</h2>
+        <div id='chatwrap' class='chatwrap' style='width:500px;height:100px;overflow-y:scroll;'>
+            <ul id='chatList' class='chatList'>
+                <li>Server initialized</li>
+            </ul>
+            <form id='chatForm' class='chatForm'>
+                <input id='chatInput' type="text" placeholder='Type Here'>
+                <button id='submit'>Say</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js'></script>
+<script src='/src/client.js'></script>
+
+</html>
