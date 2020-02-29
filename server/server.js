@@ -11,7 +11,7 @@ const socketio = require('socket.io')
 // app.get('/', (req, res) => {
 //     res.sendFile(`${clientPath}/index.html`)
 // })
-
+const a = '';
 
 
 const clientPath = `${__dirname}/../client`;

@@ -1,5 +1,6 @@
 let sock = io();
 //sign in
+const a = '';
 let signDiv = document.getElementById('signwrap');
 let signDivUsername = document.getElementById('username');
 let signDivSignIn = document.getElementById('signin');
