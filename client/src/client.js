@@ -13,6 +13,8 @@ const WIDTH = 1800;
 const HEIGHT = 800;
 const TILE_SIZE = 16;
 
+//another one
+
 signDivSignIn.onclick = (event) => {
     event.preventDefault();
     sock.emit('signIn', { username: signDivUsername.value, password: signDivPassword.value })
