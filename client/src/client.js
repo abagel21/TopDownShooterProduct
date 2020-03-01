@@ -39,8 +39,10 @@ sock.on('signUpResponse', (data) => {
 
 
 //game
-const ctx = document.getElementById('ctx').getContext('2d');
+let c = document.getElementById('ctx')
+let ctx = c.getContext('2d');
 ctx.font = '30px Arial';
+ctx.fillStyle = 'white';
 
 const writeMessage = (text) => {
     console.log(text)
