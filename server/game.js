@@ -1,7 +1,7 @@
 module.exports = class Game {
     constructor(id) {
         this.player_list = {};
-        id.forEach()
+
     }
     Player(id) {
         let self = {

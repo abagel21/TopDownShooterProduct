@@ -62,16 +62,47 @@ chatForm.addEventListener('submit', (event) => {
     sock.emit('message', text);
 })
 
-sock.on('newPositions', (data) => {
+let Animation = function(frame_set, delay){
+    this.count = 0;
+    this.delay = delay;
+    this.frame = 0;
+    this.frame_index = 0;
+    this.frame_set = frame_set;
+};
+let image = document.createElement('img');
+image.src = 'img/cubeSpritesheetgreen.jpg';
+let username = '';
+sock.on('usernameData', function(data){
+    console.log(data.id);
+    username = data.id;
+});
+sock.on('newPositions', (data) => { 
+    
     ctx.clearRect(0, 0, 1800, 800);
     for (let i = 0; i < data.player.length; i++) {
-        ctx.fillText('p', data.player[i].x, data.player[i].y)
+        ctx.drawImage(image, 5,14, 24,24,data.player[i].x-25, data.player[i].y-25, 50, 50);
+        ctx.font = '15px Arial';
+        ctx.fillText(data.player[i].hp, data.player[i].x -10, data.player[i].y+40);
+        ctx.font = '30px Arial';
+        if(data.player[i].id === username){
+            document.getElementById('hp').innerHTML = 'HP: ' + data.player[i].hp;
+        }
     }
     for (let i = 0; i < data.bullet.length; i++) {
         ctx.fillRect(data.bullet[i].x - 5, data.bullet[i].y - 5, 10, 10)
     }
-})
 
+})
+// sock.on('damaged', function(data){
+//     ctx.fillStyle = "#b94646";
+//     setTimeout(function(){
+//         ctx.fillStyle = "#ffffff";
+//     }, 5);
+// });
+sock.on('death', (data) =>{
+    console.log(ctx);
+    ctx.classList.add = "display: none;";
+});
 sock.on('message', (text) => {
     writeMessage(`[${sock.id}]${text}`)
 })
@@ -122,3 +153,5 @@ document.onmousemove = () => {
     let y = event.clientY;
     sock.emit('keyPress', { inputID: 'mouseAngle', state: { x, y } })
 }
+
+//hp

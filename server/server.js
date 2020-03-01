@@ -53,6 +53,8 @@ var Player = function(id) {
     self.pressingAttack = false;
     self.mouseAngle = 0;
     self.maxSpd = 10;
+    self.hp = 100;
+    self.alive = true;
 
     var super_update = self.update;
     self.update = function() {
@@ -125,7 +127,9 @@ Player.update = () => {
         player.update();
         pack.push({
             x: player.x,
-            y: player.y
+            y: player.y,
+            hp: player.hp,
+            id: player.id
         })
     }
     return pack;
@@ -149,6 +153,13 @@ let Bullet = (parent, angle) => {
             let p = Player.list[i];
             if (self.getDistance(p) < 32 && self.parent !== p.id) {
                 //handle collision. ex: hp--;
+                p.hp--;
+                socket_list[p.id].emit('damaged', {});
+                if(p.hp <= 0){
+                    socket_list[p.id].emit('death', Player.list[p.id]);
+                    delete socket_list[p.id];
+                    delete Player.list[p.id];
+                }
                 self.toRemove = true;
             }
         }
@@ -203,6 +214,7 @@ io.on('connection', (sock) => {
             if (res) {
                 Player.onConnect(sock);
                 sock.emit('signInResponse', { success: true });
+                sock.emit('usernameData', {id: sock.id});
             } else {
                 sock.emit('signInResponse', { success: false });
             }
@@ -276,8 +288,9 @@ setInterval(() => {
     for (let i in socket_list) {
         let sock = socket_list[i];
         sock.emit('newPositions', pack);
+
     }
-}, 250 / 25)
+}, 1000 / 24)
 
 server.on('error', (err) => {
     console.error('Server error: ' + err)
