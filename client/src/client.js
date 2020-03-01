@@ -77,7 +77,7 @@ sock.on('usernameData', function(data){
     username = data.id;
 });
 let image = document.createElement('img');
-image.src = "img/cubeSpritesheetgreen.jpg";
+image.src = "img/cubeSpritesheetpurple.png";
 
 
 sock.on('newPositions', (data) => {
@@ -90,9 +90,9 @@ sock.on('newPositions', (data) => {
             //image.classList.remove("img-hor");
         }
         if(data.player[i].team === "green"){
-            image.src = "img/cubeSpritesheetgreen.jpg";
+            image.src = "img/cubeSpritesheetpurple.png";
         } else {
-            image.src = "img/cubeSpritesheetred.jpg";
+            image.src = "img/cubeSpritesheetred.png";
         }
         ctx.drawImage(image, data.player[i].imgX, data.player[i].imgY, 24, 24, data.player[i].x-25, data.player[i].y-25, 50, 50);
         ctx.font = '15px Arial';
