@@ -62,10 +62,21 @@ chatForm.addEventListener('submit', (event) => {
     sock.emit('message', text);
 })
 
+
+let image = document.createElement('img');
+image.src = "img/cubeSpritesheetgreen.jpg";
 sock.on('newPositions', (data) => {
     ctx.clearRect(0, 0, 1800, 800);
     for (let i = 0; i < data.player.length; i++) {
-        ctx.fillText('p', data.player[i].x, data.player[i].y)
+        if(data.player[i].direction === -1){
+            console.log('flip left');
+            //image.classList.add("img-hor");
+        }
+        if(data.player[i].direction === 1){
+            console.log('flip right');
+            //image.classList.remove("img-hor");
+        }
+        ctx.drawImage(image, data.player[i].imgX, data.player[i].imgY, 24, 24, data.player[i].x-25, data.player[i].y-25, 50, 50);
     }
     for (let i = 0; i < data.bullet.length; i++) {
         ctx.fillRect(data.bullet[i].x - 5, data.bullet[i].y - 5, 10, 10)
