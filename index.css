@@ -6,6 +6,8 @@ body{
 	text-align: center;
 	background: #121221;
 	color:white;
+
+	margin:0px;
 }
  
 a{
@@ -244,12 +246,13 @@ a{
 
 	border:none;
 	background:#2d2d52;
-	padding:15px;
+	padding-top:15px;
+	padding-bottom:15px;
 
 	height:auto;
 	width:100%;
 
-	position: fixed;
+	position: relative;
 	margin:0px;
 	left:0px;
 	bottom:0px;
