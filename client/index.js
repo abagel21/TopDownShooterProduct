@@ -2,9 +2,7 @@ function signin1(){
 	document.getElementById("up").style.display = "none";
 
 
-	//document.getElementById("password").style.color = "red";
-	//document.getElementById("password").style.background = "white";
-	//document.getElementById("password").style.display = "block";
+	document.getElementById("spacer").style.height = "300px";
 
 	document.getElementById("password").classList.add("animation");
 	document.getElementById("username").classList.add("animation");
@@ -20,6 +18,7 @@ function signin1(){
 function signin2(){
 	document.getElementById("in").style.display = "none";
 
+	document.getElementById("spacer").style.height = "300px";
 
 	//document.getElementById("password").style.color = "red";
 	//document.getElementById("password").style.background = "white";
@@ -34,6 +33,12 @@ function signin2(){
 	document.getElementById("signup").style.display = "block";
 
 	//document.getElementById("signin").style.color = "red";
+}
+
+function hideimg(){
+	document.getElementById("signup").style.height = "0px";
+	document.getElementById("signup").style.display = "none";
+
 }
 
 let form = document.getElementById('formwrap');

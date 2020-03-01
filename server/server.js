@@ -26,6 +26,10 @@ const server = http.createServer(app);
 
 const io = socketio(server);
 
+let numOfGreen = 0;
+let numOfRed = 0;
+let teams = {};
+
 let socket_list = {};
 let spawnInt = Math.floor(Math.random() * 8) + 1
 
@@ -60,6 +64,7 @@ let Entity = () => {
 var Player = function(id) {
     var self = Entity();
     self.direction = 1;
+    self.team = "";
     self.up = 0;
     self.imgX = 5;
     self.imgY = 14;
@@ -76,11 +81,13 @@ var Player = function(id) {
     self.hp = 1;
     self.alive = true;
     self.maxSpd = 5;
+    self.timer = -1;
 
     var super_update = self.update;
     self.update = function() {
         self.updateSpd();
         self.animateImg();
+        self.assignTeam();
         super_update();
 
         if (self.pressingAttack) {
@@ -91,12 +98,31 @@ var Player = function(id) {
             // }
         }
     }
-    self.shootBullet = function(angle) {
-        var b = Bullet(self.id, angle);
-        b.x = self.x;
-        b.y = self.y;
+    self.assignTeam = function() {
+        if (self.team === "") {
+            if (numOfGreen <= numOfRed) {
+                self.team = "green";
+                teams[self.id] = "green";
+                numOfGreen++;
+            } else {
+                self.team = "red";
+                teams[self.id] = "red";
+                numOfRed++;
+            }
+        }
     }
 
+    self.shootBullet = function(angle) {
+            var b = Bullet(self.id, angle);
+            b.x = self.x;
+            b.y = self.y;
+        }
+        // self.shootDelay = function(){
+        //     setTimeout(() =>{self.canFire = false;}, 3000);
+        //     console.log("can't fire");
+        //     self.canFire = true;
+        //     console.log("can fire");
+        // }
     self.animateImg = function() {
         self.up += 2;
         if (self.up === 30) {
@@ -148,17 +174,32 @@ Player.onConnect = (sock) => {
             player.pressingUp = data.state;
         } else if (data.inputID === 'down') {
             player.pressingDown = data.state;
-        } else if (data.inputID === 'mouseAngle' && (data.state.x - player.x) > 0) {
+        }
+        if (data.inputID === 'mouseAngle' && (data.state.x - player.x) > 0) {
             player.mouseAngle = Math.atan((data.state.y - player.y) / (data.state.x - player.x))
-        } else if (data.inputID === 'mouseAngle' && (data.state.x - player.x) < 0) {
+        }
+        if (data.inputID === 'mouseAngle' && (data.state.x - player.x) < 0) {
             player.mouseAngle = -1 * (Math.PI / 2 + (Math.PI / 2 - Math.atan((data.state.y - player.y) / (data.state.x - player.x))))
-        } else if (data.inputID === 'attack') {
-            player.pressingAttack = data.state;
+        }
+        if (data.inputID === 'attack') {
+            console.log("attack input");
+            if (player.timer === -1) {
+                player.pressingAttack = data.state;
+                player.timer++;
+            }
         }
     });
 };
 
 Player.onDisconnect = (sock) => {
+    if (teams[sock.id] === "green") {
+        console.log('oop')
+        delete teams[sock.id];
+        numOfGreen--;
+    } else {
+        delete teams[sock.id];
+        numOfRed--;
+    }
     delete Player.list[sock.id];
 }
 
@@ -166,7 +207,19 @@ Player.update = () => {
     let pack = [];
     for (let i in Player.list) {
         let player = Player.list[i];
+        if (player.timer > 0) {
+            player.pressingAttack = false;
+            player.timer++;
+            if (player.timer >= 12) {
+                player.timer = -1;
+            }
+        }
+        //console.log(player.pressingAttack);
         player.update();
+        if (player.timer === 0) {
+            console.log("bullet should be fired");
+            player.timer++;
+        }
         pack.push({
             x: player.x,
             y: player.y,
@@ -177,6 +230,7 @@ Player.update = () => {
             imgX: player.imgX,
             imgY: player.imgY,
             direction: player.direction,
+            team: player.team,
         })
     }
     return pack;
@@ -203,6 +257,12 @@ let Bullet = (parent, angle) => {
                 p.hp--;
                 socket_list[p.id].emit('damaged', {});
                 if (p.hp <= 0) {
+                    if (teams[p] === "green") {
+                        console.log('oop');
+                        numOfGreen--;
+                    } else if (teams[p] === 'red') {
+                        numOfRed--;
+                    }
                     socket_list[p.id].emit('death', p.id);
                     delete socket_list[p.id];
                     delete Player.list[p.id];
@@ -342,6 +402,8 @@ io.on('connection', (sock) => {
     })
 
 })
+
+
 
 setInterval(() => {
     let pack = {
