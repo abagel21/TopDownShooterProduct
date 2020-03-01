@@ -72,7 +72,7 @@ var Player = function(id) {
     self.pressingDown = false;
     self.pressingAttack = false;
     self.mouseAngle = 0;
-    self.hp = 1;
+    self.hp = 5;
     self.alive = true;
     self.maxSpd = 5;
 
