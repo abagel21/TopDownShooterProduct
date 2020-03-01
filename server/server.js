@@ -2,16 +2,30 @@ const express = require('express')
 const app = express()
 const http = require('http')
 const socketio = require('socket.io')
-    // const mongojs = require('mongojs')
+const mongojs = require('mongojs')
 
-// const db = mongojs("mongodb+srv://abagel21:#Alexbaby6414159@cluster0-wykae.mongodb.net/test?retryWrites=true&w=majority", ['account ', 'progress '])
+
+
+const MongoClient = require('mongodb').MongoClient;
+const uri = "mongodb+srv://abagel21:<password>@cluster0-wykae.mongodb.net/test?retryWrites=true&w=majority";
+const client = new MongoClient(uri, { useNewUrlParser: true });
+client.connect(err => {
+    const collection = client.db("test").collection("devices");
+    // perform actions on the collection object
+    client.close();
+});
+
+
+const URI = "mongodb+srv://abagel21:Alexbaby6414159@cluster0-wykae.mongodb.net/test?retryWrites=true&w=majority";
+const db = mongojs(process.env.MONGODB_URI, ['account ', 'progress '])
+db.account.insert({ username: "alex", password: "nagel" })
+db.account.find({ username: "alex" })
 
 
 
 // app.get('/', (req, res) => {
 //     res.sendFile(`${clientPath}/index.html`)
 // })
-const a = '';
 
 
 const clientPath = `${__dirname}/../client`;
@@ -180,13 +194,12 @@ Bullet.update = () => {
 
 var USERS = {
     "alex": "nagel",
-    "aryo": "patel",
-    "nadharm": "dhiantravan",
+    "hello": "sir"
 }
 
 var isValidPassword = function(data, cb) {
-    return cb(true);
     db.account.find({ account: data.username, password: data.password }, function(err, res) {
+        console.log('isvalid reached')
         if (res.length > 0) {
             cb(true)
         } else {
@@ -195,8 +208,8 @@ var isValidPassword = function(data, cb) {
     });
 }
 var isUsernameTaken = function(data, cb) {
-    return cb(false);
     db.account.find({ account: data.username }, function(err, res) {
+        console.log('isusername reached')
         if (res.length > 0) {
             cb(true)
         } else {
@@ -205,7 +218,6 @@ var isUsernameTaken = function(data, cb) {
     });
 }
 var addUser = function(data, cb) {
-    return cb();
     db.account.insert({ account: data.username, password: data.password }, function(err, res) {
         cb();
     });
