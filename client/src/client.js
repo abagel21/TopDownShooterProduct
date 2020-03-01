@@ -13,6 +13,8 @@ const WIDTH = 1800;
 const HEIGHT = 800;
 const TILE_SIZE = 16;
 
+//another one
+
 signDivSignIn.onclick = (event) => {
     event.preventDefault();
     sock.emit('signIn', { username: signDivUsername.value, password: signDivPassword.value })
@@ -42,8 +44,10 @@ sock.on('signUpResponse', (data) => {
 
 
 //game
-const ctx = document.getElementById('ctx').getContext('2d');
+let c = document.getElementById('ctx')
+let ctx = c.getContext('2d');
 ctx.font = '30px Arial';
+ctx.fillStyle = 'white';
 
 const writeMessage = (text) => {
     const c = document.getElementById('chatList');
@@ -107,6 +111,11 @@ sock.on('newPositions', (data) => {
                     if (data.player[i].direction === 1) {
                         //image.classList.remove("img-hor");
                     }
+                    if (data.player[i].team === "green") {
+                        image.src = "img/cubeSpritesheetpurple.png";
+                    } else {
+                        image.src = "img/cubeSpritesheetred.png";
+                    }
                     console.log('x = ' + data.player[i].x + ' and y = ' + data.player[i].y)
                     console.log('oldx = ' + data.player[i].oldx + ' and oldy = ' + data.player[i].oldy)
                     ctx.drawImage(image, data.player[i].imgX, data.player[i].imgY, 24, 24, data.player[i].oldx, data.player[i].oldy, 50, 50);
@@ -127,6 +136,11 @@ sock.on('newPositions', (data) => {
                     }
                     if (data.player[i].direction === 1) {
                         //image.classList.remove("img-hor");
+                    }
+                    if (data.player[i].team === "green") {
+                        image.src = "img/cubeSpritesheetpurple.png";
+                    } else {
+                        image.src = "img/cubeSpritesheetred.png";
                     }
                     ctx.drawImage(image, data.player[i].imgX, data.player[i].imgY, 24, 24, data.player[i].x, data.player[i].y, 50, 50);
                     ctx.font = '15px Arial';
@@ -178,6 +192,7 @@ sock.on('message', (text) => {
 })
 
 sock.on('serverMessage', (text) => {
+    // console.log(`[Server]${text}`)
     writeMessage(text);
 })
 

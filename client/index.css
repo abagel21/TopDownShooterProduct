@@ -217,6 +217,19 @@ a{
 }
 
 
+#spacer {
+ 	height:100px;
+ 	width:100%;
+
+ 	background-color: transparent;
+ 
+ 	position: relative;
+ 	z-index: -1;
+ 	/*box-shadow: 1px 1px 40px  #404040;*/
+
+ }
+
+
 #footer{
 	font-size: 15px;
 
