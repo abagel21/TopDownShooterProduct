@@ -36,8 +36,8 @@ let spawnInt = Math.floor(Math.random() * 8) + 1
 
 let Entity = () => {
     let self = {
-        x: 250,
-        y: 250,
+        x: 300,
+        y: 150,
         id: '',
         spdX: 0,
         spxY: 0,
@@ -47,9 +47,6 @@ let Entity = () => {
         self.updatePosition()
     }
     self.updatePosition = () => {
-        // sock.on('collision', (data) => {
-        //     return;
-        // })
         self.oldx = self.x;
         self.oldy = self.y;
         self.x += self.spdX;
@@ -162,6 +159,10 @@ var Player = function(id) {
 Player.list = {};
 Player.onConnect = (sock) => {
     let player = Player(sock.id)
+    sock.on('collision', function(data){
+        player.x += (player.spdX*-1);
+        player.y += (player.spdY*-1);
+    });
     sock.emit('playerConnected', 'idk')
     sock.on('keyPress', function(data) {
         if (data.inputID === 'left') {
@@ -249,7 +250,6 @@ let Bullet = (parent, angle) => {
         if (self.timer++ > 100)
             self.toRemove = true;
         super_update();
-
         for (let i in Player.list) {
             let p = Player.list[i];
             if (self.getDistance(p) < 32 && self.parent !== p.id) {
@@ -274,6 +274,7 @@ let Bullet = (parent, angle) => {
     Bullet.list[self.id] = self;
     return self;
 }
+
 Bullet.list = {};
 
 Bullet.update = () => {
@@ -404,7 +405,6 @@ io.on('connection', (sock) => {
 })
 
 
-
 setInterval(() => {
     let pack = {
         player: Player.update(),
@@ -413,7 +413,6 @@ setInterval(() => {
     for (let i in socket_list) {
         let sock = socket_list[i];
         sock.emit('newPositions', pack);
-
     }
 }, 1000 / 24)
 

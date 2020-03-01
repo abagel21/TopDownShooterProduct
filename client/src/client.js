@@ -103,7 +103,7 @@ sock.on('newPositions', (data) => {
         }
         for (let a = 0; a < data.player.length; a++) {
             if (isPositionWall(data.player[a].x, data.player[a].y)) {
-                sock.emit('collision', 'txt');
+                sock.emit('collision', {id:data.player[a].id});
                 for (let i = 0; i < data.player.length; i++) {
                     if (data.player[i].direction === -1) {
                         //image.classList.add("img-hor");
@@ -127,6 +127,7 @@ sock.on('newPositions', (data) => {
                     }
                 }
                 for (let i = 0; i < data.bullet.length; i++) {
+                    sock.emit('collision', {id:data.player[a].id});
                     ctx.fillRect(data.bullet[i].x - 5, data.bullet[i].y - 5, 10, 10)
                 }
             } else {
@@ -151,6 +152,9 @@ sock.on('newPositions', (data) => {
                     }
                 }
                 for (let i = 0; i < data.bullet.length; i++) {
+                    if (isPositionWall(data.bullet[a].x, data.bullet[a].y)) {
+                        sock.emit('bulletcollision', {id:data.bullet[a].id});
+                    }
                     ctx.fillRect(data.bullet[i].x - 5, data.bullet[i].y - 5, 10, 10)
                 }
             }
