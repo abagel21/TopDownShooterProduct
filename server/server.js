@@ -29,7 +29,9 @@ const io = socketio(server);
 let socket_list = {};
 let spawnInt = Math.floor(Math.random() * 8) + 1
 
-
+let teams = {};
+let numOfGreen = 0;
+let numOfRed = 0;
 let Entity = () => {
     let self = {
         x: 300,
@@ -396,10 +398,6 @@ io.on('connection', (sock) => {
 
 })
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 6ba61df8ea2b9fa5ee93712558372a44d4ae1412
 setInterval(() => {
     let pack = {
         player: Player.update(),
