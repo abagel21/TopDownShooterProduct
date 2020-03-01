@@ -111,7 +111,8 @@ sock.on('newPositions', (data) => {
 // });
 sock.on('death', (data) =>{
     console.log(ctx);
-    ctx.classList.add = "display: none;";
+    console.log(ctx.parentElement);
+    $('canvas').remove();
 });
 sock.on('message', (text) => {
     writeMessage(`[${sock.id}]${text}`)
