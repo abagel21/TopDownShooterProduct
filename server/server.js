@@ -56,7 +56,7 @@ var Player = function(id) {
     self.pressingDown = false;
     self.pressingAttack = false;
     self.mouseAngle = 0;
-    self.hp = 100;
+    self.hp = 1;
     self.alive = true;
     self.maxSpd = 5;
 
@@ -187,7 +187,7 @@ let Bullet = (parent, angle) => {
                 p.hp--;
                 socket_list[p.id].emit('damaged', {});
                 if(p.hp <= 0){
-                    socket_list[p.id].emit('death', Player.list[p.id]);
+                    socket_list[p.id].emit('death', p.id);
                     delete socket_list[p.id];
                     delete Player.list[p.id];
                 }
@@ -250,6 +250,11 @@ io.on('connection', (sock) => {
                 sock.emit('signInResponse', { success: false });
             }
         });
+    });
+    sock.on('re-connect', function(data){
+        socket_list[data.id]  = sock;
+        Player.onConnect(sock);
+        sock.emit('test-message', "re-connection fired");
     });
     sock.on('signUp', function(data) {
         isUsernameTaken(data, function(res) {
