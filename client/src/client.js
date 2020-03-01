@@ -77,7 +77,7 @@ sock.on('usernameData', function(data) {
     username = data.id;
 });
 let image = document.createElement('img');
-image.src = "img/cubeSpritesheetgreen.jpg";
+image.src = "img/cubeSpritesheetpurple.png";
 
 let connection = false;
 
@@ -85,151 +85,6 @@ sock.on('playerConnected', (data) => {
     console.log('player success')
     connection = true;
 })
-
-sock.on('newPositions', (data) => {
-    if (!connection) {
-        return;
-    } else {
-        for (let i = 0; i < data.player.length; i++) {
-            console.log('on position is ' + isPositionWall(data.player[i].x, data.player[i].y))
-        }
-        ctx.clearRect(0, 0, 1800, 800);
-        for (let i = 0; i < data.player.length; i++) {
-            drawMap(data.player[i].x - 25, data.player[i].y - 25)
-        }
-        for (let a = 0; a < data.player.length; a++) {
-            if (isPositionWall(data.player[a].x, data.player[a].y)) {
-                sock.emit('collision', 'txt');
-                for (let i = 0; i < data.player.length; i++) {
-                    if (data.player[i].direction === -1) {
-                        //image.classList.add("img-hor");
-                    }
-                    if (data.player[i].direction === 1) {
-                        //image.classList.remove("img-hor");
-                    }
-                    console.log('x = ' + data.player[i].x + ' and y = ' + data.player[i].y)
-                    console.log('oldx = ' + data.player[i].oldx + ' and oldy = ' + data.player[i].oldy)
-                    ctx.drawImage(image, data.player[i].imgX, data.player[i].imgY, 24, 24, data.player[i].oldx, data.player[i].oldy, 50, 50);
-                    ctx.font = '15px Arial';
-                    ctx.fillText(data.player[i].hp, data.player[i].oldx - 10, data.player[i].oldy + 40);
-                    ctx.font = '30px Arial';
-                    if (data.player[i].id === username) {
-                        document.getElementById('hp').innerHTML = 'HP: ' + data.player[i].hp;
-                    }
-                }
-                for (let i = 0; i < data.bullet.length; i++) {
-                    ctx.fillRect(data.bullet[i].x - 5, data.bullet[i].y - 5, 10, 10)
-                }
-            } else {
-                for (let i = 0; i < data.player.length; i++) {
-                    if (data.player[i].direction === -1) {
-                        //image.classList.add("img-hor");
-                    }
-                    if (data.player[i].direction === 1) {
-                        //image.classList.remove("img-hor");
-                    }
-                    ctx.drawImage(image, data.player[i].imgX, data.player[i].imgY, 24, 24, data.player[i].x, data.player[i].y, 50, 50);
-                    ctx.font = '15px Arial';
-                    ctx.fillText(data.player[i].hp, data.player[i].x - 10, data.player[i].y + 40);
-                    ctx.font = '30px Arial';
-                    if (data.player[i].id === username) {
-                        document.getElementById('hp').innerHTML = 'HP: ' + data.player[i].hp;
-                    }
-                }
-                for (let i = 0; i < data.bullet.length; i++) {
-                    ctx.fillRect(data.bullet[i].x - 5, data.bullet[i].y - 5, 10, 10)
-                }
-            }
-        }
-    }
-})
-
-
-let drawMap = (x, y) => {
-        let xl = WIDTH / 2 - 4 * x;
-        let yl = HEIGHT / 2 - 4 * y;
-        ctx.drawImage(map, xl, yl, map.height * 2.5, map.width * 2.5);
-    }
-    // sock.on('damaged', function(data){
-    //     ctx.fillStyle = "#b94646";
-    //     setTimeout(function(){
-    //         ctx.fillStyle = "#ffffff";
-    //     }, 5);
-    // });
-let socketId = "";
-sock.on('death', (data) => {
-    socketId = data;
-    $('canvas').hide();
-    $('#hp').hide();
-    document.getElementById('death-screen').style.display = 'inline-block';
-    document.getElementById('death').classList.add('death-animation');
-    document.getElementById('respawn-button').classList.add('death-animation');
-
-});
-document.getElementById('respawn-button').addEventListener('click', e => {
-    $('canvas').show();
-    $('#hp').show();
-    document.getElementById('death-screen').style.display = 'none';
-    sock.emit('signIn', { username: signDivUsername.value, password: signDivPassword.value });
-    sock.emit('re-connect', { id: socketId });
-});
-sock.on('message', (text) => {
-    writeMessage(`[${sock.id}]${text}`)
-})
-
-sock.on('serverMessage', (text) => {
-    writeMessage(text);
-})
-
-document.onkeydown = function(event) {
-    if (event.keyCode === 68) {
-        sock.emit('keyPress', { inputID: 'right', state: true });
-    } else if (event.keyCode === 83) {
-        sock.emit('keyPress', { inputID: 'down', state: true });
-    } else if (event.keyCode === 65) {
-        sock.emit('keyPress', { inputID: 'left', state: true });
-    } else if (event.keyCode === 87) {
-        sock.emit('keyPress', { inputID: 'up', state: true });
-    }
-}
-
-document.onkeyup = function(event) {
-    if (event.keyCode === 68)
-        sock.emit('keyPress', { inputID: 'right', state: false });
-    else if (event.keyCode === 83)
-        sock.emit('keyPress', { inputID: 'down', state: false });
-    else if (event.keyCode === 65)
-        sock.emit('keyPress', { inputID: 'left', state: false });
-    else if (event.keyCode === 87)
-        sock.emit('keyPress', { inputID: 'up', state: false });
-}
-
-document.onmousedown = (event) => {
-    sock.emit('keyPress', { inputID: 'attack', state: true })
-}
-
-document.onmouseup = (event) => {
-    sock.emit('keyPress', { inputID: 'attack', state: false })
-}
-
-document.onmousemove = () => {
-    let x = event.clientX;
-    let y = event.clientY;
-    sock.emit('keyPress', { inputID: 'mouseAngle', state: { x, y } });
-}
-
-let isPositionWall = (x, y) => {
-    let gridX = Math.floor((x - 180) / TILE_SIZE) - 1;
-    let gridY = Math.floor((y - 80) / TILE_SIZE) - 1;
-    console.log('x is ' + gridX + ' and y is ' + gridY)
-    console.log(gridX + 40 * (gridY) - 1 + ':0')
-    console.log(grid.includes(gridX + 40 * (gridY) - 1 + ':0'))
-    if (gridX < 0 || gridY < 0 || grid.includes(gridX + 40 * (gridY) + ':1') || grid.includes(gridX + 40 * (gridY) + ':0')) {
-        return true;
-    } else {
-        return false;
-    }
-}
 
 let grid = [
     "1346:1",
@@ -979,3 +834,161 @@ let grid = [
     "669:1",
     "670:1"
 ]
+
+let isPositionWall = (x, y) => {
+    let gridX = Math.floor((x - 180) / TILE_SIZE) - 1;
+    let gridY = Math.floor((y - 80) / TILE_SIZE) - 1;
+    console.log('x is ' + gridX + ' and y is ' + gridY)
+    console.log(gridX + 40 * (gridY) - 1 + ':0')
+    console.log(grid.includes(gridX + 40 * (gridY) - 1 + ':0'))
+    if (gridX < 0 || gridY < 0 || grid.includes(gridX + 40 * (gridY) + ':1') || grid.includes(gridX + 40 * (gridY) + ':0')) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+sock.on('newPositions', (data) => {
+    if (!connection) {
+        return;
+    } else {
+        for (let i = 0; i < data.player.length; i++) {
+            console.log('on position is ' + isPositionWall(data.player[i].x, data.player[i].y))
+        }
+        ctx.clearRect(0, 0, 1800, 800);
+        for (let i = 0; i < data.player.length; i++) {
+            drawMap(data.player[i].x - 25, data.player[i].y - 25)
+        }
+        for (let a = 0; a < data.player.length; a++) {
+            if (isPositionWall(data.player[a].x, data.player[a].y)) {
+                sock.emit('collision', 'txt');
+                for (let i = 0; i < data.player.length; i++) {
+                    if (data.player[i].direction === -1) {
+                        //image.classList.add("img-hor");
+                    }
+                    if (data.player[i].direction === 1) {
+                        //image.classList.remove("img-hor");
+                    }
+                    if (data.player[i].team === "green") {
+                        image.src = "img/cubeSpritesheetpurple.png";
+                    } else {
+                        image.src = "img/cubeSpritesheetred.png";
+                    }
+                    console.log('x = ' + data.player[i].x + ' and y = ' + data.player[i].y)
+                    console.log('oldx = ' + data.player[i].oldx + ' and oldy = ' + data.player[i].oldy)
+                    ctx.drawImage(image, data.player[i].imgX, data.player[i].imgY, 24, 24, data.player[i].oldx, data.player[i].oldy, 50, 50);
+                    ctx.font = '15px Arial';
+                    ctx.fillText(data.player[i].hp, data.player[i].oldx - 10, data.player[i].oldy + 40);
+                    ctx.font = '30px Arial';
+                    if (data.player[i].id === username) {
+                        document.onload = () => { document.getElementById('hp').innerHTML = 'HP: ' + data.player[i].hp };
+                    }
+                }
+                for (let i = 0; i < data.bullet.length; i++) {
+                    ctx.fillRect(data.bullet[i].x - 5, data.bullet[i].y - 5, 10, 10)
+                }
+            } else {
+                for (let i = 0; i < data.player.length; i++) {
+                    if (data.player[i].direction === -1) {
+                        //image.classList.add("img-hor");
+                    }
+                    if (data.player[i].direction === 1) {
+                        //image.classList.remove("img-hor");
+                    }
+                    if (data.player[i].team === "green") {
+                        image.src = "img/cubeSpritesheetpurple.png";
+                    } else {
+                        image.src = "img/cubeSpritesheetred.png";
+                    }
+                    ctx.drawImage(image, data.player[i].imgX, data.player[i].imgY, 24, 24, data.player[i].x - 25, data.player[i].y - 25, 50, 50);
+                    ctx.font = '15px Arial';
+                    ctx.fillText(data.player[i].hp, data.player[i].x - 10, data.player[i].y + 40);
+                    ctx.font = '30px Arial';
+                    if (data.player[i].id === username) {
+                        document.onload = () => { document.getElementById('hp').innerHTML = 'HP: ' + data.player[i].hp };
+                    }
+                }
+                for (let i = 0; i < data.bullet.length; i++) {
+                    ctx.fillRect(data.bullet[i].x - 5, data.bullet[i].y - 5, 10, 10)
+                }
+            }
+        }
+    }
+})
+
+
+let drawMap = (x, y) => {
+        let xl = WIDTH / 2 - 4 * x;
+        let yl = HEIGHT / 2 - 4 * y;
+        ctx.drawImage(map, xl, yl, map.height * 2.5, map.width * 2.5);
+    }
+    // sock.on('damaged', function(data){
+    //     ctx.fillStyle = "#b94646";
+    //     setTimeout(function(){
+    //         ctx.fillStyle = "#ffffff";
+    //     }, 5);
+    // });
+let socketId = "";
+sock.on('death', (data) => {
+    socketId = data;
+    $('canvas').hide();
+    $('#hp').hide();
+    document.getElementById('death-screen').style.display = 'inline-block';
+    document.getElementById('death').classList.add('death-animation');
+    document.getElementById('respawn-button').classList.add('death-animation');
+
+});
+document.onload = () => {
+    document.getElementById('respawn-button').addEventListener('click', e => {
+        $('canvas').show();
+        $('#hp').show();
+        document.getElementById('death-screen').style.display = 'none';
+        sock.emit('signIn', { username: signDivUsername.value, password: signDivPassword.value });
+        sock.emit('re-connect', { id: socketId });
+    })
+};
+sock.on('message', (text) => {
+    writeMessage(`[${sock.id}]${text}`)
+})
+
+sock.on('serverMessage', (text) => {
+    // console.log(`[Server]${text}`)
+    writeMessage(text);
+})
+
+document.onkeydown = function(event) {
+    if (event.keyCode === 68) {
+        sock.emit('keyPress', { inputID: 'right', state: true });
+    } else if (event.keyCode === 83) {
+        sock.emit('keyPress', { inputID: 'down', state: true });
+    } else if (event.keyCode === 65) {
+        sock.emit('keyPress', { inputID: 'left', state: true });
+    } else if (event.keyCode === 87) {
+        sock.emit('keyPress', { inputID: 'up', state: true });
+    }
+}
+
+document.onkeyup = function(event) {
+    if (event.keyCode === 68)
+        sock.emit('keyPress', { inputID: 'right', state: false });
+    else if (event.keyCode === 83)
+        sock.emit('keyPress', { inputID: 'down', state: false });
+    else if (event.keyCode === 65)
+        sock.emit('keyPress', { inputID: 'left', state: false });
+    else if (event.keyCode === 87)
+        sock.emit('keyPress', { inputID: 'up', state: false });
+}
+
+document.onmousedown = (event) => {
+    sock.emit('keyPress', { inputID: 'attack', state: true })
+}
+
+document.onmouseup = (event) => {
+    sock.emit('keyPress', { inputID: 'attack', state: false })
+}
+
+document.onmousemove = () => {
+    let x = event.clientX;
+    let y = event.clientY;
+    sock.emit('keyPress', { inputID: 'mouseAngle', state: { x, y } });
+}
