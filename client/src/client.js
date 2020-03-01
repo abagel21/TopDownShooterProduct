@@ -69,18 +69,28 @@ let Animation = function(frame_set, delay){
     this.frame_index = 0;
     this.frame_set = frame_set;
 };
-let image = document.createElement('img');
-image.src = 'img/cubeSpritesheetgreen.jpg';
+
 let username = '';
 sock.on('usernameData', function(data){
     console.log(data.id);
     username = data.id;
 });
-sock.on('newPositions', (data) => { 
-    
+let image = document.createElement('img');
+image.src = "img/cubeSpritesheetgreen.jpg";
+
+
+sock.on('newPositions', (data) => {
     ctx.clearRect(0, 0, 1800, 800);
     for (let i = 0; i < data.player.length; i++) {
-        ctx.drawImage(image, 5,14, 24,24,data.player[i].x-25, data.player[i].y-25, 50, 50);
+        if(data.player[i].direction === -1){
+            console.log('flip left');
+            //image.classList.add("img-hor");
+        }
+        if(data.player[i].direction === 1){
+            console.log('flip right');
+            //image.classList.remove("img-hor");
+        }
+        ctx.drawImage(image, data.player[i].imgX, data.player[i].imgY, 24, 24, data.player[i].x-25, data.player[i].y-25, 50, 50);
         ctx.font = '15px Arial';
         ctx.fillText(data.player[i].hp, data.player[i].x -10, data.player[i].y+40);
         ctx.font = '30px Arial';
@@ -151,7 +161,6 @@ document.onmouseup = (event) => {
 document.onmousemove = () => {
     let x = event.clientX;
     let y = event.clientY;
-    sock.emit('keyPress', { inputID: 'mouseAngle', state: { x, y } })
+    sock.emit('keyPress', { inputID: 'mouseAngle', state: { x, y } });
 }
 
-//hp

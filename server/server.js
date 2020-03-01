@@ -4,7 +4,6 @@ const http = require('http')
 const socketio = require('socket.io')
 const mongojs = require('mongojs')
 
-
 // app.get('/', (req, res) => {
 //     res.sendFile(`${clientPath}/index.html`)
 // })
@@ -28,6 +27,7 @@ let Entity = () => {
         id: '',
         spdX: 0,
         spxY: 0,
+        img: '',
     }
     self.update = () => {
         self.updatePosition()
@@ -44,6 +44,10 @@ let Entity = () => {
 
 var Player = function(id) {
     var self = Entity();
+    self.direction = 1;
+    self.up = 0;
+    self.imgX = 5;
+    self.imgY = 14;
     self.id = id;
     self.number = "" + Math.floor(10 * Math.random());
     self.pressingRight = false;
@@ -52,13 +56,14 @@ var Player = function(id) {
     self.pressingDown = false;
     self.pressingAttack = false;
     self.mouseAngle = 0;
-    self.maxSpd = 10;
     self.hp = 100;
     self.alive = true;
+    self.maxSpd = 5;
 
     var super_update = self.update;
     self.update = function() {
         self.updateSpd();
+        self.animateImg();
         super_update();
 
         if (self.pressingAttack) {
@@ -75,15 +80,36 @@ var Player = function(id) {
         b.y = self.y;
     }
 
+    self.animateImg = function(){
+        self.up += 2;
+        if(self.up === 30){
+            self.up = 0;
+        }
+        if(self.up < 10){
+            self.imgX = 29;
+            self.imgY = 14;
+        }
+        else if (10 <= self.up && 20 < self.up){
+            self.imgX = 5;
+            self.imgY = 14;
+        }
+        
+        else{
+            self.imgX = 54;
+            self.imgY = 14;
+        };
+    }
 
     self.updateSpd = function() {
-        if (self.pressingRight)
+        if (self.pressingRight){
             self.spdX = self.maxSpd;
-        else if (self.pressingLeft)
+        }
+        else if (self.pressingLeft){
             self.spdX = -self.maxSpd;
-        else
+        }
+        else{
             self.spdX = 0;
-
+        }
         if (self.pressingUp)
             self.spdY = -self.maxSpd;
         else if (self.pressingDown)
@@ -100,8 +126,10 @@ Player.onConnect = (sock) => {
     sock.on('keyPress', function(data) {
         if (data.inputID === 'left') {
             player.pressingLeft = data.state;
+            player.direction = -1;
         } else if (data.inputID === 'right') {
             player.pressingRight = data.state;
+            player.direction = 1;
         } else if (data.inputID === 'up') {
             player.pressingUp = data.state;
         } else if (data.inputID === 'down') {
@@ -113,8 +141,8 @@ Player.onConnect = (sock) => {
         } else if (data.inputID === 'attack') {
             player.pressingAttack = data.state;
         }
-    })
-}
+    });
+};
 
 Player.onDisconnect = (sock) => {
     delete Player.list[sock.id];
@@ -129,7 +157,10 @@ Player.update = () => {
             x: player.x,
             y: player.y,
             hp: player.hp,
-            id: player.id
+            id: player.id,
+            imgX: player.imgX,
+            imgY: player.imgY,
+            direction: player.direction,
         })
     }
     return pack;
