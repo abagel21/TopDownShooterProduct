@@ -7,6 +7,8 @@ let signDivSignIn = document.getElementById('signin');
 let signDivSignUp = document.getElementById('signup');
 let signDivPassword = document.getElementById('password');
 let gamewrap = document.getElementById('gamewrap')
+const WIDTH = 1800;
+const HEIGHT = 800;
 
 signDivSignIn.onclick = (event) => {
     event.preventDefault();
@@ -63,15 +65,29 @@ chatForm.addEventListener('submit', (event) => {
     sock.emit('message', text);
 })
 
+let map = new Image();
+map.src = 'src/mapfinal.png';
+
 sock.on('newPositions', (data) => {
-    ctx.clearRect(0, 0, 1800, 800);
-    for (let i = 0; i < data.player.length; i++) {
-        ctx.fillText('p', data.player[i].x, data.player[i].y)
-    }
-    for (let i = 0; i < data.bullet.length; i++) {
-        ctx.fillRect(data.bullet[i].x - 5, data.bullet[i].y - 5, 10, 10)
+    if (!selfId)
+        return;
+    else {
+        ctx.clearRect(0, 0, 1800, 800);
+        drawMap();
+        for (let i = 0; i < data.player.length; i++) {
+            ctx.fillText('p', data.player[i].x, data.player[i].y)
+        }
+        for (let i = 0; i < data.bullet.length; i++) {
+            ctx.fillRect(data.bullet[i].x - 5, data.bullet[i].y - 5, 10, 10)
+        }
     }
 })
+
+let drawMap = () => {
+    let x = WIDTH / 2 - playerList[selfId].x;
+    let y = HEIGHT / 2 - playerList[selfId].y
+    ctx.drawImage(map, x, y);
+}
 
 sock.on('message', (text) => {
     writeMessage(`[${sock.id}]${text}`)
