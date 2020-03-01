@@ -84,11 +84,9 @@ sock.on('newPositions', (data) => {
     ctx.clearRect(0, 0, 1800, 800);
     for (let i = 0; i < data.player.length; i++) {
         if(data.player[i].direction === -1){
-            console.log('flip left');
             //image.classList.add("img-hor");
         }
         if(data.player[i].direction === 1){
-            console.log('flip right');
             //image.classList.remove("img-hor");
         }
         ctx.drawImage(image, data.player[i].imgX, data.player[i].imgY, 24, 24, data.player[i].x-25, data.player[i].y-25, 50, 50);
@@ -138,23 +136,23 @@ sock.on('message', (text) => {
 })
 
 sock.on('serverMessage', (text) => {
-    console.log(`[Server]${text}`)
+    // console.log(`[Server]${text}`)
     writeMessage(text);
 })
 
 document.onkeydown = function(event) {
     if (event.keyCode === 68) {
         sock.emit('keyPress', { inputID: 'right', state: true });
-        console.log('right')
+        // console.log('right')
     } else if (event.keyCode === 83) {
         sock.emit('keyPress', { inputID: 'down', state: true });
-        console.log('down')
+        // console.log('down')
     } else if (event.keyCode === 65) {
         sock.emit('keyPress', { inputID: 'left', state: true });
-        console.log('left')
+        // console.log('left')
     } else if (event.keyCode === 87) {
         sock.emit('keyPress', { inputID: 'up', state: true });
-        console.log('up')
+        // console.log('up')
     }
 }
 
