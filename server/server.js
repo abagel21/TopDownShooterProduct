@@ -17,6 +17,10 @@ const server = http.createServer(app);
 
 const io = socketio(server);
 
+let numOfGreen = 0;
+let numOfRed = 0;
+let teams = {};
+
 let socket_list = {};
 let spawnInt = Math.floor(Math.random() * 8) + 1
 
@@ -45,6 +49,7 @@ let Entity = () => {
 var Player = function(id) {
     var self = Entity();
     self.direction = 1;
+    self.team = "";
     self.up = 0;
     self.imgX = 5;
     self.imgY = 14;
@@ -64,6 +69,7 @@ var Player = function(id) {
     self.update = function() {
         self.updateSpd();
         self.animateImg();
+        self.assignTeam();
         super_update();
 
         if (self.pressingAttack) {
@@ -74,6 +80,20 @@ var Player = function(id) {
             // }
         }
     }
+    self.assignTeam = function(){
+        if(self.team === ""){
+            if(numOfGreen <= numOfRed){
+                self.team = "green";
+                teams[self] = "green";
+                numOfGreen++;
+            } else {
+                self.team = "red";
+                teams[self] = "red";
+                numOfRed++;
+            }
+        }
+    }
+
     self.shootBullet = function(angle) {
         var b = Bullet(self.id, angle);
         b.x = self.x;
@@ -122,7 +142,7 @@ var Player = function(id) {
 }
 Player.list = {};
 Player.onConnect = (sock) => {
-    let player = Player(sock.id)
+    let player = Player(sock.id);
     sock.on('keyPress', function(data) {
         if (data.inputID === 'left') {
             player.pressingLeft = data.state;
@@ -161,6 +181,7 @@ Player.update = () => {
             imgX: player.imgX,
             imgY: player.imgY,
             direction: player.direction,
+            team: player.team,
         })
     }
     return pack;
@@ -311,10 +332,13 @@ io.on('connection', (sock) => {
 
 })
 
+
+
 setInterval(() => {
     let pack = {
         player: Player.update(),
         bullet: Bullet.update(),
+        'teamAssignments': teams,
     }
     for (let i in socket_list) {
         let sock = socket_list[i];
