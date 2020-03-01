@@ -15,6 +15,7 @@ signDivSignIn.onclick = (event) => {
 
 sock.on('signInResponse', (data) => {
     if (data.success) {
+        console.log('fired');
         signDiv.style.display = 'none';
         gamewrap.style.display = 'inline-block';
     } else {
@@ -117,9 +118,28 @@ sock.on('newPositions', (data) => {
 //         ctx.fillStyle = "#ffffff";
 //     }, 5);
 // });
+let socketId = "";
 sock.on('death', (data) =>{
     console.log(ctx);
-    ctx.classList.add = "display: none;";
+    console.log(ctx.parentElement);
+    socketId = data;
+    $('canvas').hide();
+    $('#hp').hide();
+    document.getElementById('death-screen').style.display = 'inline-block';
+    document.getElementById('death').classList.add('death-animation');
+    document.getElementById('respawn-button').classList.add('death-animation');
+
+});
+document.getElementById('respawn-button').addEventListener('click', e =>{
+    $('canvas').show();
+    $('#hp').show();
+    document.getElementById('death-screen').style.display = 'none';
+    console.log(signDivUsername.value, signDivPassword.value);
+    sock.emit('signIn', { username: signDivUsername.value, password: signDivPassword.value });
+    sock.emit('re-connect', {id: socketId});
+});
+sock.on('test-message', function(data){
+    console.log(data);
 });
 sock.on('message', (text) => {
     writeMessage(`[${sock.id}]${text}`)
