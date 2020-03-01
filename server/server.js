@@ -43,9 +43,9 @@ let Entity = () => {
         self.updatePosition()
     }
     self.updatePosition = () => {
-        sock.on('collision', (data) => {
-            return;
-        })
+        // sock.on('collision', (data) => {
+        //     return;
+        // })
         self.oldx = self.x;
         self.oldy = self.y;
         self.x += self.spdX;
