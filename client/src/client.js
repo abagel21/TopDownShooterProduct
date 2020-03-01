@@ -81,9 +81,10 @@ sock.on('usernameData', function(data) {
     username = data.id;
 });
 let image = document.createElement('img');
-image.src = "img/cubeSpritesheetpurple.png";
+image.src = "../img/cubeSpritesheetpurple.png";
 
 let connection = false;
+let pindex = 0;
 
 sock.on('playerConnected', (data) => {
     console.log('player success')
@@ -98,9 +99,13 @@ sock.on('newPositions', (data) => {
             console.log('on position is ' + isPositionWall(data.player[i].x, data.player[i].y))
         }
         ctx.clearRect(0, 0, 1800, 800);
-        for (let i = 0; i < data.player.length; i++) {
-            drawMap(data.player[i].x - 25, data.player[i].y - 25)
+        for(let o = 0; o < data.player.length; o++) {
+            if(data.player[o].id === username) {
+                pindex = o;
+            }
         }
+            drawMap(data.player[pindex].x - 25, data.player[pindex].y - 25)
+        
         for (let a = 0; a < data.player.length; a++) {
             if (isPositionWall(data.player[a].x, data.player[a].y)) {
                 sock.emit('collision', {id:data.player[a].id});
@@ -112,9 +117,9 @@ sock.on('newPositions', (data) => {
                         //image.classList.remove("img-hor");
                     }
                     if (data.player[i].team === "green") {
-                        image.src = "img/cubeSpritesheetpurple.png";
+                        image.src = "../img/cubeSpritesheetpurple.png";
                     } else {
-                        image.src = "img/cubeSpritesheetred.png";
+                        image.src = "../img/cubeSpritesheetred.png";
                     }
                     console.log('x = ' + data.player[i].x + ' and y = ' + data.player[i].y)
                     console.log('oldx = ' + data.player[i].oldx + ' and oldy = ' + data.player[i].oldy)
@@ -139,9 +144,9 @@ sock.on('newPositions', (data) => {
                         //image.classList.remove("img-hor");
                     }
                     if (data.player[i].team === "green") {
-                        image.src = "img/cubeSpritesheetpurple.png";
+                        image.src = "../img/cubeSpritesheetpurple.png";
                     } else {
-                        image.src = "img/cubeSpritesheetred.png";
+                        image.src = "../img/cubeSpritesheetred.png";
                     }
                     ctx.drawImage(image, data.player[i].imgX, data.player[i].imgY, 24, 24, data.player[i].x, data.player[i].y, 50, 50);
                     ctx.font = '15px Arial';
