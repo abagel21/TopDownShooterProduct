@@ -239,6 +239,13 @@ let Bullet = (parent, angle) => {
                 p.hp--;
                 socket_list[p.id].emit('damaged', {});
                 if(p.hp <= 0){
+                    if (teams[p] === "green"){
+                        console.log('oop');
+                        numOfGreen--;
+                    }
+                    else{
+                        numOfRed--;
+                    }
                     socket_list[p.id].emit('death', p.id);
                     delete socket_list[p.id];
                     delete Player.list[p.id];
