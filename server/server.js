@@ -4,11 +4,10 @@ const http = require('http')
 const socketio = require('socket.io')
 const mongojs = require('mongojs')
 
-
-// const URI = "mongodb+srv://abagel21:Alexbaby6414159@cluster0-wykae.mongodb.net/test?retryWrites=true&w=majority";
-// const db = mongojs(process.env.MONGODB_URI, ['account ', 'progress '])
-// db.account.insert({ username: "alex", password: "nagel" })
-// db.account.find({ username: "alex" })
+const URI = "mongodb+srv://abagel21:Alexbaby6414159@cluster0-wykae.mongodb.net/test?retryWrites=true&w=majority";
+const db = mongojs(process.env.MONGODB_URI, ['account ', 'progress '])
+db.account.insert({ username: "alex", password: "nagel" })
+db.account.find({ username: "alex" })
 
 
 
@@ -298,7 +297,6 @@ var USERS = {
 }
 
 var isValidPassword = function(data, cb) {
-    return cb(true)
     db.account.find({ account: data.username, password: data.password }, function(err, res) {
         console.log('isvalid reached')
         if (res.length > 0) {
@@ -309,7 +307,6 @@ var isValidPassword = function(data, cb) {
     });
 }
 var isUsernameTaken = function(data, cb) {
-    return cb(false)
     db.account.find({ account: data.username }, function(err, res) {
         console.log('isusername reached')
         if (res.length > 0) {
@@ -320,7 +317,6 @@ var isUsernameTaken = function(data, cb) {
     });
 }
 var addUser = function(data, cb) {
-    return cb()
     db.account.insert({ account: data.username, password: data.password }, function(err, res) {
         cb();
     });
