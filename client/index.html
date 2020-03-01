@@ -3,21 +3,40 @@
 
 <head>
     <title>pointnshoot</title>
+    <link rel="stylesheet" href="index.css">
 </head>
 
 <body>
     <div id='signwrap'>
+
         <form id='formwrap'>
-            <h3>Username: </h3>
-            <input type="text" id='username' placeholder='Username'>
-            <h3>Password: </h3>
-            <input type="password" id='password' placeholder='Password'>
-            <button id='signin'>Sign In</button>
-            <button id='signup'>Sign Up</button>
+
+            <div id="header">DA CUBE</div>
+
+            <button onclick="signin1()" class="start" id="in">Sign In</button>
+            <button onclick="signin2()"class="start" id='up'>Sign Up</button>
+
+            <div id="yes">
+                <input type="text" id='username' class='username'placeholder='Username'>
+                <input type="password" id='password' class='password' placeholder='Password'>
+
+                 <button id='signin'> Submit</button>
+                 <button id='signup'> Submit</button>
+            </div>
+
+           
         </form>
     </div>
     <div id=gamewrap style='display:none'>
-        <canvas id='ctx' width='1800' height='800' style='border:1px solid #000000;'></canvas>
+        <span id = "username"></span>
+        <span id = "hp" style = "position: absolute; padding: 10px;">HP: </span>
+        <canvas id='ctx' width='800' height='800' style='border:1px solid #000000;'></canvas>
+        <div id = "death-screen" style = "display: none;">
+            <h1 id = "death">You Died</h1>
+            <div class = "spacer"></div>
+            <button id = "respawn-button">Respawn</button>
+
+        </div>
         <h2>COOL GAME HERE</h2>
         <div id='chatwrap' class='chatwrap' style='width:500px;height:100px;overflow-y:scroll;'>
             <ul id='chatList' class='chatList'>
@@ -30,8 +49,12 @@
         </div>
     </div>
 
+    <div id="footer" ><a href="about.html"> about us!</a></div>
+
 </body>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js'></script>
 <script src='/src/client.js'></script>
+<script src='index.js'></script>
 
 </html>

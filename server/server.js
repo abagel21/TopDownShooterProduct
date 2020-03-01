@@ -29,6 +29,7 @@ const io = socketio(server);
 let socket_list = {};
 let spawnInt = Math.floor(Math.random() * 8) + 1
 
+
 let Entity = () => {
     let self = {
         x: 250,
@@ -36,11 +37,17 @@ let Entity = () => {
         id: '',
         spdX: 0,
         spxY: 0,
+        img: '',
     }
     self.update = () => {
         self.updatePosition()
     }
     self.updatePosition = () => {
+        sock.on('collision', (data) => {
+            return;
+        })
+        self.oldx = self.x;
+        self.oldy = self.y;
         self.x += self.spdX;
         self.y += self.spdY;
     }
@@ -52,7 +59,13 @@ let Entity = () => {
 
 var Player = function(id) {
     var self = Entity();
+    self.direction = 1;
+    self.up = 0;
+    self.imgX = 5;
+    self.imgY = 14;
     self.id = id;
+    self.oldx = 250;
+    self.oldy = 250;
     self.number = "" + Math.floor(10 * Math.random());
     self.pressingRight = false;
     self.pressingLeft = false;
@@ -60,11 +73,14 @@ var Player = function(id) {
     self.pressingDown = false;
     self.pressingAttack = false;
     self.mouseAngle = 0;
-    self.maxSpd = 10;
+    self.hp = 1;
+    self.alive = true;
+    self.maxSpd = 5;
 
     var super_update = self.update;
     self.update = function() {
         self.updateSpd();
+        self.animateImg();
         super_update();
 
         if (self.pressingAttack) {
@@ -81,15 +97,31 @@ var Player = function(id) {
         b.y = self.y;
     }
 
+    self.animateImg = function() {
+        self.up += 2;
+        if (self.up === 30) {
+            self.up = 0;
+        }
+        if (self.up < 10) {
+            self.imgX = 29;
+            self.imgY = 14;
+        } else if (10 <= self.up && 20 < self.up) {
+            self.imgX = 5;
+            self.imgY = 14;
+        } else {
+            self.imgX = 54;
+            self.imgY = 14;
+        };
+    }
 
     self.updateSpd = function() {
-        if (self.pressingRight)
+        if (self.pressingRight) {
             self.spdX = self.maxSpd;
-        else if (self.pressingLeft)
+        } else if (self.pressingLeft) {
             self.spdX = -self.maxSpd;
-        else
+        } else {
             self.spdX = 0;
-
+        }
         if (self.pressingUp)
             self.spdY = -self.maxSpd;
         else if (self.pressingDown)
@@ -104,11 +136,14 @@ var Player = function(id) {
 Player.list = {};
 Player.onConnect = (sock) => {
     let player = Player(sock.id)
+    sock.emit('playerConnected', 'idk')
     sock.on('keyPress', function(data) {
         if (data.inputID === 'left') {
             player.pressingLeft = data.state;
+            player.direction = -1;
         } else if (data.inputID === 'right') {
             player.pressingRight = data.state;
+            player.direction = 1;
         } else if (data.inputID === 'up') {
             player.pressingUp = data.state;
         } else if (data.inputID === 'down') {
@@ -120,8 +155,8 @@ Player.onConnect = (sock) => {
         } else if (data.inputID === 'attack') {
             player.pressingAttack = data.state;
         }
-    })
-}
+    });
+};
 
 Player.onDisconnect = (sock) => {
     delete Player.list[sock.id];
@@ -134,7 +169,14 @@ Player.update = () => {
         player.update();
         pack.push({
             x: player.x,
-            y: player.y
+            y: player.y,
+            oldx: player.oldx,
+            oldy: player.oldy,
+            hp: player.hp,
+            id: player.id,
+            imgX: player.imgX,
+            imgY: player.imgY,
+            direction: player.direction,
         })
     }
     return pack;
@@ -158,6 +200,13 @@ let Bullet = (parent, angle) => {
             let p = Player.list[i];
             if (self.getDistance(p) < 32 && self.parent !== p.id) {
                 //handle collision. ex: hp--;
+                p.hp--;
+                socket_list[p.id].emit('damaged', {});
+                if (p.hp <= 0) {
+                    socket_list[p.id].emit('death', p.id);
+                    delete socket_list[p.id];
+                    delete Player.list[p.id];
+                }
                 self.toRemove = true;
             }
         }
@@ -223,10 +272,16 @@ io.on('connection', (sock) => {
             if (res) {
                 Player.onConnect(sock);
                 sock.emit('signInResponse', { success: true });
+                sock.emit('usernameData', { id: sock.id });
             } else {
                 sock.emit('signInResponse', { success: false });
             }
         });
+    });
+    sock.on('re-connect', function(data) {
+        socket_list[data.id] = sock;
+        Player.onConnect(sock);
+        sock.emit('test-message', "re-connection fired");
     });
     sock.on('signUp', function(data) {
         isUsernameTaken(data, function(res) {
@@ -296,8 +351,9 @@ setInterval(() => {
     for (let i in socket_list) {
         let sock = socket_list[i];
         sock.emit('newPositions', pack);
+
     }
-}, 250 / 25)
+}, 1000 / 24)
 
 server.on('error', (err) => {
     console.error('Server error: ' + err)
