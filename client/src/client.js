@@ -81,7 +81,7 @@ sock.on('usernameData', function(data) {
     username = data.id;
 });
 let image = document.createElement('img');
-image.src = "img/cubeSpritesheetpurple.png";
+image.src = "img/cubeSpritesheetgreen.jpg";
 
 let connection = false;
 

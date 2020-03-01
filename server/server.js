@@ -26,10 +26,6 @@ const server = http.createServer(app);
 
 const io = socketio(server);
 
-let numOfGreen = 0;
-let numOfRed = 0;
-let teams = {};
-
 let socket_list = {};
 let spawnInt = Math.floor(Math.random() * 8) + 1
 
@@ -61,7 +57,6 @@ let Entity = () => {
 var Player = function(id) {
     var self = Entity();
     self.direction = 1;
-    self.team = "";
     self.up = 0;
     self.imgX = 5;
     self.imgY = 14;
@@ -78,13 +73,11 @@ var Player = function(id) {
     self.hp = 1;
     self.alive = true;
     self.maxSpd = 5;
-    self.timer = -1;
 
     var super_update = self.update;
     self.update = function() {
         self.updateSpd();
         self.animateImg();
-        self.assignTeam();
         super_update();
 
         if (self.pressingAttack) {
@@ -231,7 +224,6 @@ Player.update = () => {
             imgX: player.imgX,
             imgY: player.imgY,
             direction: player.direction,
-            team: player.team,
         })
     }
     return pack;
@@ -404,7 +396,10 @@ io.on('connection', (sock) => {
 
 })
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 6ba61df8ea2b9fa5ee93712558372a44d4ae1412
 setInterval(() => {
     let pack = {
         player: Player.update(),
