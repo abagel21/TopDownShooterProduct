@@ -7,7 +7,7 @@ body{
 	background: #121221;
 	color:white;
 }
-
+ 
 a{
 	color:white;
 	text-decoration: none;
@@ -64,6 +64,12 @@ a{
 	top:0px;
 
 	z-index:100;
+}
+
+#headerpic{
+	margin:0px;
+	left:0px;
+	position:relative;
 }
 
 
