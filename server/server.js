@@ -84,11 +84,11 @@ var Player = function(id) {
         if(self.team === ""){
             if(numOfGreen <= numOfRed){
                 self.team = "green";
-                teams[self] = "green";
+                teams[self.id] = "green";
                 numOfGreen++;
             } else {
                 self.team = "red";
-                teams[self] = "red";
+                teams[self.id] = "red";
                 numOfRed++;
             }
         }
@@ -165,6 +165,15 @@ Player.onConnect = (sock) => {
 };
 
 Player.onDisconnect = (sock) => {
+    if (teams[sock.id] === "green"){
+        console.log('oop')
+        delete teams[sock.id];
+        numOfGreen--;
+    }
+    else{
+        delete teams[sock.id];
+        numOfRed--;
+    }
     delete Player.list[sock.id];
 }
 
@@ -343,7 +352,6 @@ setInterval(() => {
     let pack = {
         player: Player.update(),
         bullet: Bullet.update(),
-        'teamAssignments': teams,
     }
     for (let i in socket_list) {
         let sock = socket_list[i];
