@@ -97,6 +97,7 @@ sock.on('newPositions', (data) => {
     } else {
         for (let i = 0; i < data.player.length; i++) {
             console.log('on position is ' + isPositionWall(data.player[i].x, data.player[i].y))
+            console.log('x is ' + data.player[i].x + 'and y is ' + data.player[i].y)
         }
         ctx.clearRect(0, 0, 1800, 800);
         for(let o = 0; o < data.player.length; o++) {
